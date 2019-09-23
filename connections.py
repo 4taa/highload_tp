@@ -103,7 +103,7 @@ class createWorker:
             pathToFile = os.path.join(pathToFile, self.reqParser.requestLine.INDEX_FILE_NAME)
 
         if not os.path.exists(pathToFile):
-            print('{} - {} FILE PATH DOES NOT EXIST {}'.format(addr, now, pathToFile))
+            print('{} - {} no such file path {}'.format(addr, now, pathToFile))
 
             if isAdded:
                 response = Response(403, setHeaders())
@@ -113,7 +113,7 @@ class createWorker:
             await self.asyncWrite(client, response)
         else:
             if incorrectFile and not isAdded:
-                print('{} - {} FILE PATH WITH TERMINATING SLASH {}'.format(addr, now, pathToFile))
+                print('{} - {} path with extra slash {}'.format(addr, now, pathToFile))
                 response = Response(404, setHeaders())
                 await self.asyncWrite(client, response)
             else:
