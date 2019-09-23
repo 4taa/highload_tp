@@ -14,9 +14,11 @@
 ## AB highload
 
 `ab -n 1000 -c 100 0.0.0.0/httptest/wikipedia.html`
+
 ![alt text](./highload_ab.jpg)
 
 ## AB nginx
 
 `ab -n 1000 -c 100 0.0.0.0/httptest/wikipedia.html`
+
 ![alt text](./nginx_ab.jpg)
