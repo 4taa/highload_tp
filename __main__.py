@@ -18,10 +18,10 @@ def main():
 
     if localConfig.config_file:
         print('Setting parsed config')
-        num_workers = configFile(args.config_file).num_workers
-        port = configFile(args.config_file).port
-        host = configFile(args.config_file).host
-        document_root = configFile(args.config_file).document_root
+        num_workers = configFile(localConfig.config_file).num_workers
+        port = configFile(localConfig.config_file).port
+        host = configFile(localConfig.config_file).host
+        document_root = configFile(localConfig.config_file).document_root
     else: 
         print('Setting default config')
         num_workers = localConfig.num_workers
