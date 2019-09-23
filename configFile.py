@@ -2,7 +2,7 @@ import os
 import re
 
 __all__ = (
-    'ConfigFileParser',
+    'configFile',
 )
 
 
@@ -10,7 +10,7 @@ def errorMessage(message):
     return 'Incorrect httpd.conf: {}.'.format(message)
 
 
-class ConfigFileParser:
+class configFile:
     NUM_WORKERS = r'cpu_limit (?P<num_workers>\d+)'
     DOCUMENT_ROOT = r'document_root (?P<document_root>[^\s]+)'
     HOST = r'host (?P<host>[^\s]+)'
@@ -66,6 +66,7 @@ class ConfigFileParser:
             match = self.portRegEx.search(data)
 
             if match:
+                print('kek')
                 self.port = int(match.group('port'))
             else:
                 self.port = 80

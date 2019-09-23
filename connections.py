@@ -7,8 +7,8 @@ from urllib.parse import unquote
 
 import uvloop
 
-from response import Response
-from request import RequestParser
+from response import response
+from request import requestParser
 
 __all__ = (
     'createConnetion',
@@ -42,9 +42,9 @@ class createWorker:
 
     def __init__(self, sock, document_root):
         self.document_root = os.path.abspath(document_root)
-        self.reqParser = RequestParser()
+        self.reqParser = requestParser()
 
-        self.socketet = sock
+        self.socket = sock
 
         self.loop = None
 
@@ -155,6 +155,6 @@ if __name__ == '__main__':
     worker = createWorker(sock, '/tmp')
 
     try:
-        worker.idle()
+        worker.pause()
     except KeyboardInterrupt:
         sock.close()

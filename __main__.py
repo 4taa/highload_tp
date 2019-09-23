@@ -1,20 +1,22 @@
 from multiprocessing import Process
 
 from config import createParser
-from configFile import ConfigFileParser
+from configFile import configFile
 
 from connections import createConnetion
 from connections import createWorker
 
 def workerWrap(sock, document_root):
     worker = createWorker(sock, document_root)
-    worker.idle()
+    worker.pause()
 
 def main():
     processes = []
 
     configParser = createParser()
     localConfig = configParser.parse_args()
+
+    print(localConfig)
 
     if localConfig.config_file:
         print('Setting parsed config')
@@ -29,6 +31,7 @@ def main():
         host = localConfig.host
         document_root = localConfig.document_root
 
+    print('type = ', type(port));
     socket = createConnetion(host, port)
 
     try:
