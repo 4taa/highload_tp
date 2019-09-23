@@ -11,10 +11,12 @@
 
 `docker run -it -v /Users/p.pupchin/Desktop/tpProject/highload_tp/http-test-suite:/usr/share/nginx/html:ro -p 80:80 -d nginx`
 
-## AB docker
+## AB highload
 
 `ab -n 1000 -c 100 0.0.0.0/httptest/wikipedia.html`
+![alt text](./highload_ab.jpg)
 
 ## AB nginx
 
 `ab -n 1000 -c 100 0.0.0.0/httptest/wikipedia.html`
+![alt text](./nginx_ab.jpg)
