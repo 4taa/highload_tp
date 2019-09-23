@@ -16,14 +16,12 @@ def main():
     configParser = createParser()
     localConfig = configParser.parse_args()
 
-    print(localConfig)
-
     if localConfig.config_file:
         print('Setting parsed config')
-        num_workers = ConfigFileParser(args.config_file).num_workers
-        port = ConfigFileParser(args.config_file).port
-        host = ConfigFileParser(args.config_file).host
-        document_root = ConfigFileParser(args.config_file).document_root
+        num_workers = configFile(args.config_file).num_workers
+        port = configFile(args.config_file).port
+        host = configFile(args.config_file).host
+        document_root = configFile(args.config_file).document_root
     else: 
         print('Setting default config')
         num_workers = localConfig.num_workers
@@ -31,7 +29,6 @@ def main():
         host = localConfig.host
         document_root = localConfig.document_root
 
-    print('type = ', type(port));
     socket = createConnetion(host, port)
 
     try:
