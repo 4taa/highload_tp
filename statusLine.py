@@ -26,8 +26,8 @@ class statusLine:
 
     def __str__(self):
         reasonPhrase = getReasonPhraseByCode(self.statusCode)
-        return 'HTTP/{} {} {}'.format(self.HTTP_VERSION, self.statusCode, reason_phrase)
+        return 'HTTP/{} {} {}'.format(self.HTTP_VERSION, self.statusCode, reasonPhrase)
 
     def __repr__(self):
         reasonPhrase = getReasonPhraseByCode(self.statusCode)
-        return 'Status line: HTTP/{} {} {}'.format(self.HTTP_VERSION, self.statusCode, reason_phrase)
+        return 'Status line: HTTP/{} {} {}'.format(self.HTTP_VERSION, self.statusCode, reasonPhrase)

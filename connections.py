@@ -7,7 +7,7 @@ from urllib.parse import unquote
 
 import uvloop
 
-from response import response
+from response import Response
 from request import requestParser
 
 __all__ = (
@@ -38,7 +38,7 @@ def setHeaders():
 class createWorker:
     ALLOWED_METHODS = ('GET', 'HEAD')
     INDEX_FILE_NAME = 'index.html'
-    SOCK_BUFFER_SIZE = 1024
+    SOCKET_BUFFER_SIZE = 1024
 
     def __init__(self, sock, document_root):
         self.document_root = os.path.abspath(document_root)
@@ -77,17 +77,17 @@ class createWorker:
             client.close()
             return
 
-        if self.reqParser.request_line.method not in self.ALLOWED_METHODS:
+        if self.reqParser.requestLine.method not in self.ALLOWED_METHODS:
             print('{} - {} depricated method'.format(addr, now))
             response = Response(405, setHeaders())
             await self.asyncWrite(client, response)
             client.close()
             return
 
-        pathToFile = os.path.abspath(os.path.join(self.document_root, self.reqParser.request_line.path))
+        pathToFile = os.path.abspath(os.path.join(self.document_root, self.reqParser.requestLine.path))
         pathToFile = unquote(pathToFile)
 
-        incorrectFile = (not pathToFile.endswith('/')) and self.reqParser.request_line.path.endswith('/')
+        incorrectFile = (not pathToFile.endswith('/')) and self.reqParser.requestLine.path.endswith('/')
 
         if self.document_root not in pathToFile:
             print('{} - {} incorrect path'.format(addr, now))
@@ -100,7 +100,7 @@ class createWorker:
 
         if os.path.isdir(pathToFile):
             isAdded = True
-            pathToFile = os.path.join(pathToFile, self.reqParser.request_line.INDEX_FILE_NAME)
+            pathToFile = os.path.join(pathToFile, self.reqParser.requestLine.INDEX_FILE_NAME)
 
         if not os.path.exists(pathToFile):
             print('{} - {} FILE PATH DOES NOT EXIST {}'.format(addr, now, pathToFile))
@@ -126,7 +126,7 @@ class createWorker:
 
                 response = Response(200, headers)
 
-                if self.reqParser.request_line.method == 'HEAD':
+                if self.reqParser.requestLine.method == 'HEAD':
                     await self.asyncWrite(client, response)
                 else:
                     with open(pathToFile, 'rb') as fp:
@@ -135,14 +135,14 @@ class createWorker:
         client.close()
     
     async def asyncRead(self, client):
-        return (await self.loop.sock_recv(client, self.socket_BUFFER_SIZE)).decode('utf-8')
+        return (await self.loop.sock_recv(client, self.SOCKET_BUFFER_SIZE)).decode('utf-8')
 
     async def asyncWrite(self, client, response, fp=None):
         await self.loop.sock_sendall(client, str(response).encode('utf-8'))
 
         if fp is not None:
             while True:
-                line = fp.read(self.socket_BUFFER_SIZE)
+                line = fp.read(self.SOCKET_BUFFER_SIZE)
 
                 if not line:
                     return
