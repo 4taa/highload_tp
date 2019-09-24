@@ -1,3 +1,5 @@
+import logging
+
 from multiprocessing import Process
 
 from config import createParser
@@ -13,17 +15,17 @@ def workerWrap(sock, document_root):
 def main():
     processes = []
 
+    logging.basicConfig(level=logging.ERROR)
+
     configParser = createParser()
     localConfig = configParser.parse_args()
 
     if localConfig.config_file:
-        print('Setting parsed config')
         num_workers = configFile(localConfig.config_file).num_workers
         port = configFile(localConfig.config_file).port
         host = configFile(localConfig.config_file).host
         document_root = configFile(localConfig.config_file).document_root
     else: 
-        print('Setting default config')
         num_workers = localConfig.num_workers
         port = localConfig.port
         host = localConfig.host
@@ -33,7 +35,6 @@ def main():
 
     try:
         for numProcess in range(num_workers):
-            print('{} started'.format(numProcess))
             currentProcess = Process(target=workerWrap, args=(socket, document_root))
             processes.append(currentProcess)
             currentProcess.start()
@@ -42,7 +43,6 @@ def main():
             process.join()
     except KeyboardInterrupt:
         for numProcess, process in enumerate(processes):
-            print('{} stopped'.format(numProcess))
             process.terminate()
         socket.close()
 

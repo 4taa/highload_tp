@@ -66,7 +66,6 @@ class configFile:
             match = self.portRegEx.search(data)
 
             if match:
-                print('kek')
                 self.port = int(match.group('port'))
             else:
                 self.port = 80

@@ -60,8 +60,6 @@ class createWorker:
             addr = ':'.join([str(part) for part in addr])
             now = datetime.now().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
-            print('{} - {} request'.format(addr, now))
-
             self.loop.create_task(self.request(client, addr))
     
     async def request(self, client, addr):
@@ -70,15 +68,12 @@ class createWorker:
         now = datetime.now().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
         if not self.reqParser(request):
-            print('request: "{}"'.format(request))
-            print('{} - {} parse error'.format(addr, now))
             response = Response(400, setHeaders())
             await self.asyncWrite(client, response)
             client.close()
             return
 
         if self.reqParser.requestLine.method not in self.ALLOWED_METHODS:
-            print('{} - {} depricated method'.format(addr, now))
             response = Response(405, setHeaders())
             await self.asyncWrite(client, response)
             client.close()
@@ -90,7 +85,6 @@ class createWorker:
         incorrectFile = (not pathToFile.endswith('/')) and self.reqParser.requestLine.path.endswith('/')
 
         if self.document_root not in pathToFile:
-            print('{} - {} incorrect path'.format(addr, now))
             response = Response(403, setHeaders())
             await self.asyncWrite(client, response)
             client.close()
@@ -103,8 +97,6 @@ class createWorker:
             pathToFile = os.path.join(pathToFile, self.reqParser.requestLine.INDEX_FILE_NAME)
 
         if not os.path.exists(pathToFile):
-            print('{} - {} no such file path {}'.format(addr, now, pathToFile))
-
             if isAdded:
                 response = Response(403, setHeaders())
             else:
@@ -113,11 +105,9 @@ class createWorker:
             await self.asyncWrite(client, response)
         else:
             if incorrectFile and not isAdded:
-                print('{} - {} path with extra slash {}'.format(addr, now, pathToFile))
                 response = Response(404, setHeaders())
                 await self.asyncWrite(client, response)
             else:
-                print('{} - {} OK'.format(addr, now))
 
                 headers = setHeaders()
                 headers.append(('Content-Length', str(os.path.getsize(pathToFile))))
