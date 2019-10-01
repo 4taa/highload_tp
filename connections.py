@@ -58,24 +58,23 @@ class createWorker:
             client, addr = await self.loop.sock_accept(self.socket)
 
             addr = ':'.join([str(part) for part in addr])
-            now = datetime.now().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
             self.loop.create_task(self.request(client, addr))
     
     async def request(self, client, addr):
-        request = await self.asyncRead(client)
-
-        now = datetime.now().strftime('%a, %d %b %Y %H:%M:%S GMT')
+        request = (await self.loop.sock_recv(client, self.SOCKET_BUFFER_SIZE)).decode('utf-8')
 
         if not self.reqParser(request):
             response = Response(400, setHeaders())
-            await self.asyncWrite(client, response)
+            await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+            await self.loop.sock_sendall(client, None)
             client.close()
             return
 
         if self.reqParser.requestLine.method not in self.ALLOWED_METHODS:
             response = Response(405, setHeaders())
-            await self.asyncWrite(client, response)
+            await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+            await self.loop.sock_sendall(client, None)
             client.close()
             return
 
@@ -86,7 +85,8 @@ class createWorker:
 
         if self.document_root not in pathToFile:
             response = Response(403, setHeaders())
-            await self.asyncWrite(client, response)
+            await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+            await self.loop.sock_sendall(client, None)
             client.close()
             return
 
@@ -102,11 +102,14 @@ class createWorker:
             else:
                 response = Response(404, setHeaders())
 
-            await self.asyncWrite(client, response)
+            await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+            await self.loop.sock_sendall(client, None)
         else:
             if incorrectFile and not isAdded:
                 response = Response(404, setHeaders())
-                await self.asyncWrite(client, response)
+
+                await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+                await self.loop.sock_sendall(client, None)
             else:
 
                 headers = setHeaders()
@@ -117,28 +120,14 @@ class createWorker:
                 response = Response(200, headers)
 
                 if self.reqParser.requestLine.method == 'HEAD':
-                    await self.asyncWrite(client, response)
+                    await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+                    await self.loop.sock_sendall(client, None)
                 else:
                     with open(pathToFile, 'rb') as fp:
-                        await self.asyncWrite(client, response, fp)
+                        await self.loop.sock_sendall(client, str(response).encode('utf-8'))
+                        await self.loop.sock_sendall(client, fp.read(self.SOCKET_BUFFER_SIZE))
 
         client.close()
-    
-    async def asyncRead(self, client):
-        return (await self.loop.sock_recv(client, self.SOCKET_BUFFER_SIZE)).decode('utf-8')
-
-    async def asyncWrite(self, client, response, fp=None):
-        await self.loop.sock_sendall(client, str(response).encode('utf-8'))
-
-        if fp is not None:
-            while True:
-                line = fp.read(self.SOCKET_BUFFER_SIZE)
-
-                if not line:
-                    return
-
-                await self.loop.sock_sendall(client, line)
-
 
 if __name__ == '__main__':
     sock = createConnetion('localhost', 8001)
